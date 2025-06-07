@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FM24/25 Player Potential Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .input-section {
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .input-group {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .input-group label {
+            flex: 1;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .input-group select, .input-group input {
+            flex: 2;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .result {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: none;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .attribute-table {
+            margin-top: 10px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .attribute-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .attribute-table th {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: 1px solid #ddd;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+        select {
+            margin: 5px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+        }
+        .attribute-section {
+            margin-bottom: 15px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .attribute-section h4 {
+            margin-bottom: 10px;
+            color: #4CAF50;
+            font-size: 18px;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        h3 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .input-group label, .input-group select, .input-group input {
+                flex: none;
+                width: 100%;
+                margin: 5px 0;
+            }
+            .attribute-section {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>FM24/25 Player Potential Calculator</h1>
+    <div class="input-section">
+        <div class="input-group">
+            <label for="position">Position: </label>
+            <select id="position">
+                <option value="GK">Goalkeeper (GK)</option>
+                <option value="LB">Left Back (LB)</option>
+                <option value="LCB">Left Center Back (LCB)</option>
+                <option value="CB">Center Back (CB)</option>
+                <option value="RCB">Right Center Back (RCB)</option>
+                <option value="RB">Right Back (RB)</option>
+                <option value="LM">Left Midfielder (LM)</option>
+                <option value="LCM">Left Central Midfielder (LCM)</option>
+                <option value="CM">Central Midfielder (CM)</option>
+                <option value="RCM">Right Central Midfielder (RCM)</option>
+                <option value="RM">Right Midfielder (RM)</option>
+                <option value="LW">Left Winger (LW)</option>
+                <option value="RW">Right Winger (RW)</option>
+                <option value="LAM">Left Attacking Midfielder (LAM)</option>
+                <option value="AM">Attacking Midfielder (AM)</option>
+                <option value="RAM">Right Attacking Midfielder (RAM)</option>
+                <option value="LF">Left Forward (LF)</option>
+                <option value="ST">Striker (ST)</option>
+                <option value="RF">Right Forward (RF)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="role">Role: </label>
+            <select id="role">
+                <optgroup label="Goalkeeper (GK)">
+                    <option value="SweeperKeeperSupport">Sweeper Keeper (Support)</option>
+                    <option value="Goalkeeper">Goalkeeper</option>
+                </optgroup>
+                <optgroup label="Left Back (LB) / Right Back (RB)">
+                    <option value="FullBackSupport">Full Back (Support)</option>
+                    <option value="FullBackAttack">Full Back (Attack)</option>
+                    <option value="WingBackSupport">Wing Back (Support)</option>
+                    <option value="WingBackAttack">Wing Back (Attack)</option>
+                    <option value="InvertedFullBackSupport">Inverted Full Back (Support)</option>
+                    <option value="InvertedFullBackAttack">Inverted Full Back (Attack)</option>
+                    <option value="NoNonsenseFullBack">No-Nonsense Full Back</option>
+                    <option value="CompleteFullBack">Complete Full Back</option>
+                </optgroup>
+                <optgroup label="Left Center Back (LCB) / Center Back (CB) / Right Center Back (RCB)">
+                    <option value="BallPlayingDefenderDefend">Ball Playing Defender (Defend)</option>
+                    <option value="BallPlayingDefenderSupport">Ball Playing Defender (Support)</option>
+                    <option value="BallPlayingDefenderAttack">Ball Playing Defender (Attack)</option>
+                    <option value="NoNonsenseCentreBack">No-Nonsense Centre-Back</option>
+                    <option value="CentreBackDefend">Centre-Back (Defend)</option>
+                    <option value="BallWinningDefender">Ball Winning Defender</option>
+                </optgroup>
+                <optgroup label="Left Central Midfielder (LCM) / Central Midfielder (CM) / Right Central Midfielder (RCM)">
+                    <option value="DeepLyingPlaymakerDefend">Deep Lying Playmaker (Defend)</option>
+                    <option value="DeepLyingPlaymakerSupport">Deep Lying Playmaker (Support)</option>
+                    <option value="BoxToBoxMidfielder">Box-to-Box Midfielder</option>
+                    <option value="CentralMidfielderDefend">Central Midfielder (Defend)</option>
+                    <option value="CentralMidfielderSupport">Central Midfielder (Support)</option>
+                    <option value="CentralMidfielderAttack">Central Midfielder (Attack)</option>
+                    <option value="MezzalaSupport">Mezzala (Support)</option>
+                    <option value="MezzalaAttack">Mezzala (Attack)</option>
+                    <option value="Regista">Regista</option>
+                    <option value="Carrilero">Carrilero</option>
+                </optgroup>
+                <optgroup label="Left Midfielder (LM) / Right Midfielder (RM) / Left Winger (LW) / Right Winger (RW)">
+                    <option value="WingerSupport">Winger (Support)</option>
+                    <option value="WingerAttack">Winger (Attack)</option>
+                    <option value="InsideForwardSupport">Inside Forward (Support)</option>
+                    <option value="InsideForwardAttack">Inside Forward (Attack)</option>
+                    <option value="AdvancedPlaymakerSupport">Advanced Playmaker (Support)</option>
+                    <option value="InvertedWingerSupport">Inverted Winger (Support)</option>
+                    <option value="InvertedWingerAttack">Inverted Winger (Attack)</option>
+                </optgroup>
+                <optgroup label="Left Attacking Midfielder (LAM) / Attacking Midfielder (AM) / Right Attacking Midfielder (RAM)">
+                    <option value="AttackingMidfielderSupport">Attacking Midfielder (Support)</option>
+                    <option value="AttackingMidfielderAttack">Attacking Midfielder (Attack)</option>
+                    <option value="AdvancedPlaymakerAttack">Advanced Playmaker (Attack)</option>
+                    <option value="Enganche">Enganche</option>
+                </optgroup>
+                <optgroup label="Left Forward (LF) / Striker (ST) / Right Forward (RF)">
+                    <option value="AdvancedForward">Advanced Forward</option>
+                    <option value="Poacher">Poacher</option>
+                    <option value="CompleteForwardSupport">Complete Forward (Support)</option>
+                    <option value="CompleteForwardAttack">Complete Forward (Attack)</option>
+                    <option value="FalseNine">False Nine</option>
+                    <option value="TargetForward">Target Forward</option>
+                </optgroup>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="currentAbility">Current Ability (1-5 stars): </label>
+            <select id="currentAbility">
+                <option value="1">1 Star</option>
+                <option value="1.5">1.5 Stars</option>
+                <option value="2">2 Stars</option>
+                <option value="2.5">2.5 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="3.5">3.5 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="4.5">4.5 Stars</option>
+                <option value="5">5 Stars</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="potentialAbility">Potential Ability (1-5 stars): </label>
+            <select id="potentialAbility">
+                <option value="1">1 Star</option>
+                <option value="1.5">1.5 Stars</option>
+                <option value="2">2 Stars</option>
+                <option value="2.5">2.5 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="3.5">3.5 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="4.5">4.5 Stars</option>
+                <option value="5">5 Stars</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="age">Age: </label>
+            <input type="number" id="age" min="15" max="40" value="19">
+        </div>
+        <div class="input-group">
+            <label for="trainingFacilities">Training Facilities (1-5 stars): </label>
+            <select id="trainingFacilities">
+                <option value="1">1 Star</option>
+                <option value="2">2 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="5">5 Stars</option>
+            </select>
+        </div>
+        <h3>Attributes (1-20):</h3>
+        <div class="attribute-section">
+            <h4>Technical Attributes:</h4>
+            <div class="input-group"><label for="Corners">Corners: </label><select id="Corners"></select></div>
+            <div class="input-group"><label for="Crossing">Crossing: </label><select id="Crossing"></select></div>
+            <div class="input-group"><label for="Dribbling">Dribbling: </label><select id="Dribbling"></select></div>
+            <div class="input-group"><label for="Finishing">Finishing: </label><select id="Finishing"></select></div>
+            <div class="input-group"><label for="FirstTouch">First Touch: </label><select id="FirstTouch"></select></div>
+            <div class="input-group"><label for="FreeKickTaking">Free Kick Taking: </label><select id="FreeKickTaking"></select></div>
+            <div class="input-group"><label for="Heading">Heading: </label><select id="Heading"></select></div>
+            <div class="input-group"><label for="LongShots">Long Shots: </label><select id="LongShots"></select></div>
+            <div class="input-group"><label for="LongThrows">Long Throws: </label><select id="LongThrows"></select></div>
+            <div class="input-group"><label for="Marking">Marking: </label><select id="Marking"></select></div>
+            <div class="input-group"><label for="Passing">Passing: </label><select id="Passing"></select></div>
+            <div class="input-group"><label for="PenaltyTaking">Penalty Taking: </label><select id="PenaltyTaking"></select></div>
+            <div class="input-group"><label for="Tackling">Tackling: </label><select id="Tackling"></select></div>
+            <div class="input-group"><label for="Technique">Technique: </label><select id="Technique"></select></div>
+        </div>
+        <div class="attribute-section">
+            <h4>Mental Attributes:</h4>
+            <div class="input-group"><label for="Aggression">Aggression: </label><select id="Aggression"></select></div>
+            <div class="input-group"><label for="Anticipation">Anticipation: </label><select id="Anticipation"></select></div>
+            <div class="input-group"><label for="Bravery">Bravery: </label><select id="Bravery"></select></div>
+            <div class="input-group"><label for="Composure">Composure: </label><select id="Composure"></select></div>
+            <div class="input-group"><label for="Concentration">Concentration: </label><select id="Concentration"></select></div>
+            <div class="input-group"><label for="Decisions">Decisions: </label><select id="Decisions"></select></div>
+            <div class="input-group"><label for="Determination">Determination: </label><select id="Determination"></select></div>
+            <div class="input-group"><label for="Flair">Flair: </label><select id="Flair"></select></div>
+            <div class="input-group"><label for="Leadership">Leadership: </label><select id="Leadership"></select></div>
+            <div class="input-group"><label for="OffTheBall">Off the Ball: </label><select id="OffTheBall"></select></div>
+            <div class="input-group"><label for="Positioning">Positioning: </label><select id="Positioning"></select></div>
+            <div class="input-group"><label for="Teamwork">Teamwork: </label><select id="Teamwork"></select></div>
+            <div class="input-group"><label for="Vision">Vision: </label><select id="Vision"></select></div>
+            <div class="input-group"><label for="WorkRate">Work Rate: </label><select id="WorkRate"></select></div>
+        </div>
+        <div class="attribute-section">
+            <h4>Physical Attributes:</h4>
+            <div class="input-group"><label for="Acceleration">Acceleration: </label><select id="Acceleration"></select></div>
+            <div class="input-group"><label for="Agility">Agility: </label><select id="Agility"></select></div>
+            <div class="input-group"><label for="Balance">Balance: </label><select id="Balance"></select></div>
+            <div class="input-group"><label for="JumpingReach">Jumping Reach: </label><select id="JumpingReach"></select></div>
+            <div class="input-group"><label for="NaturalFitness">Natural Fitness: </label><select id="NaturalFitness"></select></div>
+            <div class="input-group"><label for="Pace">Pace: </label><select id="Pace"></select></div>
+            <div class="input-group"><label for="Stamina">Stamina: </label><select id="Stamina"></select></div>
+            <div class="input-group"><label for="Strength">Strength: </label><select id="Strength"></select></div>
+        </div>
+        <br>
+        <button id="runButton" onclick="calculatePotential()">Run</button>
+        <div id="error" class="error"></div>
+    </div>
+    <div id="result" class="result"></div>
+
+    <script>
+        console.log("Script loaded at 11:03 AM BST, June 07, 2025");
+
+        // Define FM24PlayerPotentialCalculator class globally
+        class FM24PlayerPotentialCalculator {
+            constructor(playerData) {
+                this.player = playerData;
+                this.currentAbilityStars = this.player.currentAbility || 1; // Initialize with default from screenshot
+                this.potentialAbilityStars = this.player.potentialAbility || 5; // Initialize with default from screenshot
+                if (isNaN(this.currentAbilityStars) || isNaN(this.potentialAbilityStars)) {
+                    console.error("Invalid star values - currentAbilityStars:", this.currentAbilityStars, "potentialAbilityStars:", this.potentialAbilityStars);
+                    this.currentAbilityStars = 1; // Fallback
+                    this.potentialAbilityStars = 5; // Fallback
+                }
+                this.maxCA = 200;
+            }
+
+            estimateCA() {
+                const weights = this.positionWeights[this.player.role] || this.positionWeights['Goalkeeper']; // Default to Goalkeeper if role invalid
+                console.log("Using role weights for:", this.player.role);
+                console.log("Current Ability Stars:", this.currentAbilityStars);
+
+                // Updated star mapping with half-star increments: 1=20, 1.5=40, 2=60, 2.5=80, 3=100, 3.5=130, 4=150, 4.5=175, 5=200
+                const starToCA = [0, 20, 40, 60, 80, 100, 130, 150, 175, 200];
+                const index = Math.min(Math.round(this.currentAbilityStars * 2), starToCA.length - 1); // Cap index
+                if (index < 0 || index >= starToCA.length) {
+                    console.error("Invalid index for starToCA:", index);
+                    return 0; // Fallback
+                }
+                const baseCA = Math.round(starToCA[index] * 0.8); // 80% base, 40% from attributes
+
+                let attributeScore = 0;
+                const attributes = this.player.attributes || {};
+                for (const [attr, weight] of Object.entries(weights)) {
+                    const value = attributes[attr] || 1; // Default to 1 from screenshot
+                    attributeScore += value * weight * 10; // Scale to 0-200 range
+                }
+
+                // Attribute contribution set to 40% of maxCA
+                const maxAttributeContribution = 200 * 0.4;
+                attributeScore = Math.min((attributeScore / 200) * maxAttributeContribution, maxAttributeContribution);
+
+                // Combine base CA with attribute adjustment
+                const estimatedCA = Math.round(baseCA + attributeScore);
+                console.log("Estimated CA:", estimatedCA);
+                return estimatedCA > this.maxCA ? this.maxCA : estimatedCA;
+            }
+
+            estimatePA() {
+                console.log("Potential Ability Stars:", this.potentialAbilityStars);
+
+                const currentCA = this.estimateCA();
+                const age = this.player.age || 19;
+                const determination = this.player.attributes?.Determination || 1; // Default to 1 from screenshot
+                const facilities = this.player.trainingFacilities || 5; // Default to 5 stars from screenshot
+
+                // Updated star mapping with half-star increments: 1=20, 1.5=40, 2=60, 2.5=80, 3=100, 3.5=130, 4=150, 4.5=175, 5=200
+                const starToPA = [0, 20, 40, 60, 80, 100, 130, 150, 175, 200];
+                const index = Math.min(Math.round(this.potentialAbilityStars * 2), starToPA.length - 1); // Cap index
+                if (index < 0 || index >= starToPA.length) {
+                    console.error("Invalid index for starToPA:", index);
+                    return currentCA; // Fallback
+                }
+                const basePA = starToPA[index];
+
+                // Map 1-5 stars to 1-20 range internally for facilities
+                const scaledFacilities = Math.round((facilities / 5) * 20);
+
+                // Calculate average attribute value to scale growth
+                const attrValues = Object.values(this.player.attributes);
+                const avgAttr = attrValues.reduce((a, b) => a + b, 0) / attrValues.length || 1; // Default to 1
+                const minGrowthThreshold = 1;
+
+                // Growth potential scaled by average attribute, with cap based on star difference and attribute average
+                const ageFactor = age <= 18 ? 1.2 : age <= 21 ? 1.1 : age <= 25 ? 1.0 : 0.8;
+                const devFactor = Math.max(0.1, (determination / 20) * 0.5 + (scaledFacilities / 20) * 0.5);
+                const growthFactor = Math.max(0, (avgAttr - minGrowthThreshold) / 19) * 0.5; // Reduced impact of low attributes
+                const maxGrowth = Math.min((this.potentialAbilityStars - this.currentAbilityStars) * 50, 25 + (avgAttr - 1) * 5); // Cap growth, max 25 + attribute boost
+                const growthPotential = Math.min(currentCA * (0.1 + (ageFactor * devFactor * 0.3)) * growthFactor, maxGrowth);
+
+                // Ensure PA is at least CA and round to integer
+                const estimatedPA = Math.round(Math.max(basePA + growthPotential, currentCA));
+                console.log("Estimated PA:", estimatedPA);
+                return Math.min(estimatedPA, this.maxCA);
+            }
+
+            calculateDevelopmentFactor() {
+                const age = this.player.age || 19;
+                const determination = this.player.attributes?.Determination || 1;
+                const facilities = this.player.trainingFacilities || 5;
+                const scaledFacilities = Math.round((facilities / 5) * 20);
+                const ageFactor = age <= 18 ? 1 : age <= 21 ? 0.9 : 0.7;
+                return (ageFactor * 0.4 + (determination / 20) * 0.3 + (scaledFacilities / 20) * 0.3);
+            }
+
+            calculatePotentialScore() {
+                const currentCA = this.estimateCA();
+                const potentialPA = this.estimatePA();
+                const devFactor = this.calculateDevelopmentFactor();
+                const projectedCA = Math.min(currentCA + ((potentialPA - currentCA) * devFactor), potentialPA);
+                return {
+                    potentialScore: Math.round((projectedCA / this.maxCA) * 100),
+                    estimatedCA: currentCA,
+                    paRange: [currentCA, potentialPA]
+                };
+            }
+
+            // Position weights based on FM24 roles (tuned for accuracy, emphasizing key attributes)
+            positionWeights = {
+                'SweeperKeeperSupport': { Reflexes: 0.30, Handling: 0.25, OneOnOnes: 0.15, RushingOut: 0.15, Positioning: 0.10, CommandOfArea: 0.05 },
+                'Goalkeeper': { Reflexes: 0.35, Handling: 0.30, OneOnOnes: 0.15, Positioning: 0.10, CommandOfArea: 0.10 },
+                'FullBackSupport': { Tackling: 0.15, Marking: 0.15, Pace: 0.15, Crossing: 0.15, Acceleration: 0.15, Stamina: 0.10, WorkRate: 0.10, Positioning: 0.05 },
+                'FullBackAttack': { Tackling: 0.10, Marking: 0.10, Pace: 0.25, Crossing: 0.20, Acceleration: 0.20, Stamina: 0.10, Dribbling: 0.05 },
+                'WingBackSupport': { Tackling: 0.15, Crossing: 0.20, Stamina: 0.20, WorkRate: 0.15, Pace: 0.15, Acceleration: 0.10, Positioning: 0.05 },
+                'WingBackAttack': { Tackling: 0.10, Crossing: 0.25, Stamina: 0.20, WorkRate: 0.15, Pace: 0.20, Acceleration: 0.10 },
+                'InvertedFullBackSupport': { Tackling: 0.15, Passing: 0.20, Pace: 0.15, WorkRate: 0.10, Acceleration: 0.15, Stamina: 0.10, Positioning: 0.10, Technique: 0.05 },
+                'InvertedFullBackAttack': { Tackling: 0.10, Passing: 0.20, Pace: 0.20, WorkRate: 0.10, Acceleration: 0.20, Technique: 0.15, Stamina: 0.05 },
+                'NoNonsenseFullBack': { Tackling: 0.30, Marking: 0.20, Positioning: 0.15, Strength: 0.15, WorkRate: 0.10, Anticipation: 0.10 },
+                'CompleteFullBack': { Tackling: 0.10, Marking: 0.10, Pace: 0.20, Crossing: 0.20, Acceleration: 0.15, Stamina: 0.10, Dribbling: 0.10, FirstTouch: 0.05 },
+                'BallPlayingDefenderDefend': { Tackling: 0.25, Marking: 0.15, Heading: 0.15, Positioning: 0.15, Passing: 0.15, Strength: 0.10, JumpingReach: 0.05 },
+                'BallPlayingDefenderSupport': { Tackling: 0.15, Marking: 0.10, Heading: 0.10, Passing: 0.25, Positioning: 0.15, Technique: 0.10, Vision: 0.10, Concentration: 0.05 },
+                'BallPlayingDefenderAttack': { Tackling: 0.10, Marking: 0.10, Heading: 0.10, Passing: 0.30, Positioning: 0.10, Technique: 0.15, Vision: 0.10, Decisions: 0.05 },
+                'NoNonsenseCentreBack': { Tackling: 0.30, Marking: 0.20, Positioning: 0.15, Strength: 0.15, Heading: 0.10, WorkRate: 0.10 },
+                'CentreBackDefend': { Tackling: 0.25, Marking: 0.15, Positioning: 0.15, Heading: 0.15, Strength: 0.10, JumpingReach: 0.10, Concentration: 0.10 },
+                'BallWinningDefender': { Tackling: 0.30, Marking: 0.15, Positioning: 0.15, Strength: 0.15, WorkRate: 0.10, Bravery: 0.10, Anticipation: 0.05 },
+                'DeepLyingPlaymakerDefend': { Tackling: 0.10, Passing: 0.30, Technique: 0.15, Positioning: 0.15, Vision: 0.10, FirstTouch: 0.10, Decisions: 0.10 },
+                'DeepLyingPlaymakerSupport': { Passing: 0.30, Technique: 0.15, Vision: 0.15, FirstTouch: 0.10, Positioning: 0.10, Decisions: 0.10, OffTheBall: 0.10 },
+                'BoxToBoxMidfielder': { Tackling: 0.15, Passing: 0.15, WorkRate: 0.25, Stamina: 0.15, Positioning: 0.10, Strength: 0.10, Acceleration: 0.10 },
+                'CentralMidfielderDefend': { Tackling: 0.25, Passing: 0.15, Positioning: 0.15, WorkRate: 0.10, Stamina: 0.10, Concentration: 0.10, Anticipation: 0.05 },
+                'CentralMidfielderSupport': { Passing: 0.20, Technique: 0.15, WorkRate: 0.15, Stamina: 0.10, FirstTouch: 0.10, Vision: 0.10, Decisions: 0.10 },
+                'CentralMidfielderAttack': { Passing: 0.15, Technique: 0.15, Vision: 0.25, FirstTouch: 0.10, OffTheBall: 0.10, Decisions: 0.10, Flair: 0.05 },
+                'MezzalaSupport': { Passing: 0.15, Technique: 0.15, WorkRate: 0.25, Stamina: 0.15, Vision: 0.10, FirstTouch: 0.10, OffTheBall: 0.10 },
+                'MezzalaAttack': { Passing: 0.10, Technique: 0.15, Vision: 0.20, FirstTouch: 0.10, OffTheBall: 0.10, Acceleration: 0.15, Dribbling: 0.10 },
+                'Regista': { Passing: 0.30, Technique: 0.15, Vision: 0.20, FirstTouch: 0.15, Flair: 0.10, Decisions: 0.10 },
+                'Carrilero': { Passing: 0.15, WorkRate: 0.25, Stamina: 0.25, Technique: 0.10, Vision: 0.10, FirstTouch: 0.10, OffTheBall: 0.05 },
+                'WingerSupport': { Dribbling: 0.25, Pace: 0.20, Crossing: 0.15, Acceleration: 0.15, Stamina: 0.10, WorkRate: 0.10, FirstTouch: 0.05 },
+                'WingerAttack': { Dribbling: 0.25, Pace: 0.25, Acceleration: 0.15, Finishing: 0.10, FirstTouch: 0.10, OffTheBall: 0.10, Technique: 0.05 },
+                'InsideForwardSupport': { Dribbling: 0.25, Pace: 0.15, Finishing: 0.15, FirstTouch: 0.15, Acceleration: 0.10, Technique: 0.10, OffTheBall: 0.10 },
+                'InsideForwardAttack': { Dribbling: 0.25, Pace: 0.20, Finishing: 0.25, FirstTouch: 0.10, Acceleration: 0.10, Technique: 0.10, OffTheBall: 0.10 },
+                'AdvancedPlaymakerSupport': { Passing: 0.15, Vision: 0.25, Technique: 0.15, FirstTouch: 0.15, Flair: 0.15, OffTheBall: 0.10, Decisions: 0.05 },
+                'InvertedWingerSupport': { Dribbling: 0.15, Pace: 0.15, Passing: 0.25, Technique: 0.15, FirstTouch: 0.10, Acceleration: 0.10, Vision: 0.10 },
+                'InvertedWingerAttack': { Dribbling: 0.15, Pace: 0.15, Passing: 0.25, Technique: 0.15, FirstTouch: 0.10, Acceleration: 0.10, Finishing: 0.10 },
+                'AttackingMidfielderSupport': { Passing: 0.15, Vision: 0.25, Technique: 0.15, FirstTouch: 0.15, Flair: 0.15, OffTheBall: 0.10, Decisions: 0.05 },
+                'AttackingMidfielderAttack': { Passing: 0.10, Vision: 0.25, Technique: 0.15, FirstTouch: 0.15, Flair: 0.25, OffTheBall: 0.10 },
+                'AdvancedPlaymakerAttack': { Passing: 0.15, Vision: 0.25, Technique: 0.15, FirstTouch: 0.15, Flair: 0.15, Dribbling: 0.10, OffTheBall: 0.05 },
+                'Enganche': { Passing: 0.30, Vision: 0.30, Technique: 0.15, FirstTouch: 0.15, Flair: 0.10 },
+                'AdvancedForward': { Finishing: 0.30, Pace: 0.15, Acceleration: 0.15, FirstTouch: 0.10, OffTheBall: 0.15, Dribbling: 0.10, Composure: 0.05 },
+                'Poacher': { Finishing: 0.35, OffTheBall: 0.25, Anticipation: 0.15, FirstTouch: 0.10, Composure: 0.10, Decisions: 0.05 },
+                'CompleteForwardSupport': { Finishing: 0.15, Passing: 0.15, Technique: 0.15, FirstTouch: 0.15, OffTheBall: 0.10, Dribbling: 0.10, WorkRate: 0.10, Composure: 0.10 },
+                'CompleteForwardAttack': { Finishing: 0.30, Pace: 0.15, Acceleration: 0.15, FirstTouch: 0.10, Dribbling: 0.10, OffTheBall: 0.10, Technique: 0.10 },
+                'FalseNine': { Passing: 0.15, Technique: 0.25, FirstTouch: 0.25, Vision: 0.15, OffTheBall: 0.10, Dribbling: 0.10 },
+                'TargetForward': { Finishing: 0.15, Heading: 0.25, Strength: 0.25, Positioning: 0.15, JumpingReach: 0.10, WorkRate: 0.10 }
+            };
+        }
+
+        // Define calculatePotential globally
+        function calculatePotential() {
+            const errorDiv = document.getElementById('error');
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+
+            const getValue = (id, defaultValue, parseFn, min, max) => {
+                const elem = document.getElementById(id);
+                if (!elem) {
+                    console.error(`Element with id '${id}' not found`);
+                    return defaultValue;
+                }
+                const value = parseFn(elem.value);
+                console.log(`Value for ${id}: ${value}`); // Debug log
+                if (isNaN(value) || value < min || value > max) {
+                    console.warn(`Invalid value for ${id}, using default: ${defaultValue}`);
+                    return defaultValue;
+                }
+                return value;
+            };
+
+            // Get current dropdown values
+            const positionSelect = document.getElementById('position');
+            const roleSelect = document.getElementById('role');
+            const position = positionSelect.value || 'LM'; // Default to LM from screenshot
+            const role = roleSelect.value || 'SweeperKeeperSupport'; // Default to SweeperKeeperSupport from screenshot
+            console.log(`Selected Position: ${position}, Selected Role: ${role}`);
+
+            const playerData = {
+                position: position,
+                role: role,
+                currentAbility: getValue('currentAbility', 1, parseFloat, 1, 5), // Use parseFloat for half-stars, default to 1 from screenshot
+                potentialAbility: getValue('potentialAbility', 5, parseFloat, 1, 5), // Use parseFloat for half-stars, default to 5 from screenshot
+                age: getValue('age', 19, parseInt, 15, 40), // Default to 19 from screenshot
+                trainingFacilities: getValue('trainingFacilities', 5, parseInt, 1, 5), // Default to 5 stars from screenshot
+                attributes: {}
+            };
+
+            if (playerData.currentAbility > playerData.potentialAbility) {
+                errorDiv.textContent = 'Current Ability cannot exceed Potential Ability in stars.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const attributes = ['Corners', 'Crossing', 'Dribbling', 'Finishing', 'FirstTouch', 'FreeKickTaking', 'Heading', 'LongShots', 'LongThrows', 'Marking', 'Passing', 'PenaltyTaking', 'Tackling', 'Technique', 'Aggression', 'Anticipation', 'Bravery', 'Composure', 'Concentration', 'Decisions', 'Determination', 'Flair', 'Leadership', 'OffTheBall', 'Positioning', 'Teamwork', 'Vision', 'WorkRate', 'Acceleration', 'Agility', 'Balance', 'JumpingReach', 'NaturalFitness', 'Pace', 'Stamina', 'Strength'];
+            let allValid = true;
+            attributes.forEach(attr => {
+                const value = getValue(attr, 1, parseInt, 1, 20); // Default to 1 from screenshot
+                if (value < 1 || value > 20) {
+                    allValid = false;
+                }
+                playerData.attributes[attr] = value;
+            });
+
+            if (!allValid) {
+                errorDiv.textContent = 'Please select valid values (1-20) for all attributes.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const calculator = new FM24PlayerPotentialCalculator(playerData);
+                const result = calculator.calculatePotentialScore();
+
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `
+                    <p><strong>Player Position:</strong> ${playerData.position}</p>
+                    <p><strong>Player Role:</strong> ${playerData.role}</p>
+                    <p><strong>Current Ability:</strong> ${playerData.currentAbility} Stars (~${Math.round((playerData.currentAbility / 5) * 200 * 0.8)})</p>
+                    <p><strong>Potential Ability:</strong> ${playerData.potentialAbility} Stars (~${Math.round((playerData.potentialAbility / 5) * 200)})</p>
+                    <p><strong>Estimated Current Ability (Adjusted):</strong> ${Math.round(result.estimatedCA)}</p>
+                    <p><strong>Estimated Potential Ability:</strong> ${Math.round(result.paRange[1])}</p>
+                    <p><strong>Potential Score (0–100):</strong> ${result.potentialScore}</p>
+                    <table class="attribute-table">
+                        <tr><th>Attribute</th><th>Value</th></tr>
+                        ${attributes.map(attr => `<tr><td>${attr}</td><td>${playerData.attributes[attr]}</td></tr>`).join('')}
+                    </table>
+                `;
+                resultDiv.style.display = 'block';
+            } catch (e) {
+                errorDiv.textContent = 'An error occurred: ' + e.message;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        // Populate dropdowns on DOM load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM loaded at 10:57 AM BST, June 07, 2025");
+            const attributes = ['Corners', 'Crossing', 'Dribbling', 'Finishing', 'FirstTouch', 'FreeKickTaking', 'Heading', 'LongShots', 'LongThrows', 'Marking', 'Passing', 'PenaltyTaking', 'Tackling', 'Technique', 'Aggression', 'Anticipation', 'Bravery', 'Composure', 'Concentration', 'Decisions', 'Determination', 'Flair', 'Leadership', 'OffTheBall', 'Positioning', 'Teamwork', 'Vision', 'WorkRate', 'Acceleration', 'Agility', 'Balance', 'JumpingReach', 'NaturalFitness', 'Pace', 'Stamina', 'Strength'];
+            attributes.forEach(attr => {
+                const select = document.getElementById(attr);
+                for (let i = 1; i <= 20; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.text = i;
+                    select.appendChild(option);
+                }
+            });
+
+            // Ensure initial run on page load
+            calculatePotential();
+        });
+    </script>
+</body>
+</html>
